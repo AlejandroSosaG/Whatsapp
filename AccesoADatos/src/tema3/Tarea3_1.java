@@ -25,10 +25,11 @@ public class Tarea3_1 {
       		+ "6. Eliminar una tabla.");
       opc = sc.nextInt();
       
-      if(opc>1) tabla = sc.nextLine();
+      if(opc>1) tabla = sc.next();
       switch (opc) {
 	case 1:
 		con = conectar(con, st, servidor);
+		st = con.createStatement();
 		break;
 	case 2:
 		crearTablas(st, tabla, games);
@@ -58,12 +59,7 @@ public class Tarea3_1 {
           Class.forName("com.mysql.cj.jdbc.Driver");
           connection = DriverManager.getConnection(servidor,"asosa","asosa");
           String use = "USE ad2223_asosa";
-          if ( connection != null){
-              st = connection.createStatement();
-              System.out.println("Conexión a base de datos test correcta ");
-              System.out.println(st.toString());
-          }else System.out.println("Conexión fallida");
-          st.execute(use);
+         
       } catch (ClassNotFoundException e) {
           e.printStackTrace();
       }catch (SQLException e){
@@ -75,8 +71,8 @@ public class Tarea3_1 {
    * Este método crea la tabla que nos pasa el usuario por parámetro.
    */
   public static void crearTablas(Statement st, String tabla, String []campos) throws SQLException {
-      String sql2 = "DELETE from ad2223_asosa." + tabla + ";";
-      String sql="CREATE TABLE ad2223_asosa." + tabla +"(";
+      //String sql2 = "DELETE from " + tabla + ";";
+      String sql="CREATE TABLE " + tabla +"(";
       for(int i = 0; i < campos.length; i++){
 
           if (i == campos.length - 1){
@@ -87,8 +83,9 @@ public class Tarea3_1 {
       }
       sql += ")";
       System.out.println(sql);
+      //st.executeUpdate(sql2);
       st.executeUpdate(sql);
-      st.executeUpdate(sql2);
+      
 }
   /*
    * Este método inserta los datos en la tabla que nos pasa el usuario por parámetro.
