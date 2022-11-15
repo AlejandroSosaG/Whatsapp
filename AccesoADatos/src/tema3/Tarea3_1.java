@@ -28,28 +28,45 @@ public class Tarea3_1 {
       if(opc>1) tabla = sc.next();
       switch (opc) {
 	case 1:
-		con = conectar(con, st, servidor);
+		con = DriverManager.getConnection(servidor,"ad2223_asosa","1234");
 		st = con.createStatement();
+		con = conectar(con, st, servidor);
 		break;
 	case 2:
+		st = con.createStatement();
 		crearTablas(st, tabla, games);
 		break;
 	case 3:
+		st = con.createStatement();
 		insertar(st, tabla);
 		break;
 	case 4:
-		listarGames(con);
+		st = con.createStatement();
+		switch(tabla.toLowerCase()) {
+		case "player":
+			listarPlayer(con);
+			break;
+		case "games":
+			listarGames(con);
+			break;
+		case "compras":
+			listarCompras(con);
+			break;
+			default: System.out.println("No existe ninguna tabla con ese nombre");
+		}
+		System.out.println();
 		break;
 	case 5:
 		modificar(st, tabla);
 		break;
 	case 6:
+		st = con.createStatement();
 		borrar(st, tabla);
 		break;
 	default:
 		System.out.println("Programa finalizado");
 	}
-      }while(opc<7);
+      }while(opc<7 && opc>0);
     }
   /*
    * Este método se conecta con la base de datos.
@@ -57,9 +74,12 @@ public class Tarea3_1 {
   public static Connection conectar(Connection connection, Statement st, String servidor) {
 	  try {
           Class.forName("com.mysql.cj.jdbc.Driver");
-          connection = DriverManager.getConnection(servidor,"asosa","asosa");
           String use = "USE ad2223_asosa";
-         
+          st.execute(use);
+          System.out.println("Conexión a base de datos correcta");
+          System.out.println();
+          //String sql = "SET PASSWORD FOR '1234'@'%' = password ('asosa')";
+          //st.execute(sql);
       } catch (ClassNotFoundException e) {
           e.printStackTrace();
       }catch (SQLException e){
@@ -71,8 +91,8 @@ public class Tarea3_1 {
    * Este método crea la tabla que nos pasa el usuario por parámetro.
    */
   public static void crearTablas(Statement st, String tabla, String []campos) throws SQLException {
-      //String sql2 = "DELETE from " + tabla + ";";
-      String sql="CREATE TABLE " + tabla +"(";
+      //String sql2 = "DELETE IF EXISTS TABLE " + tabla + ";";
+      String sql="CREATE TABLE IF NOT EXISTS " + tabla +"(";
       for(int i = 0; i < campos.length; i++){
 
           if (i == campos.length - 1){
@@ -83,6 +103,7 @@ public class Tarea3_1 {
       }
       sql += ")";
       System.out.println(sql);
+      System.out.println();
       //st.executeUpdate(sql2);
       st.executeUpdate(sql);
       
@@ -102,8 +123,9 @@ public class Tarea3_1 {
 	}catch (IOException e) {
 		throw new RuntimeException(e);
 	}
-	  if(tabla!=null) System.out.println("Inserción de datos ejecutado correctamente");
+	  if(tabla!=null) System.out.println("Inserción de datos ejecutada correctamente");
 		else System.out.println("Inserción fallida");
+	  System.out.println();
 }
   /*
    * Este método muestra los datos de la tabla Player.
@@ -142,16 +164,18 @@ public class Tarea3_1 {
    * Este método modifica los datos de la tabla que nos pasa el usuario por parámetro.
    */
   public static void modificar(Statement st, String tabla) throws SQLException {
-		String mod = "UPDATE " + tabla + " SET nombre_columna =valor, nombre_columna=valor2 WHERE nombre_columna =valor;";
+	  	String col1=sc.nextLine(), col2=sc.nextLine(), valor1=sc.nextLine(), valor2=sc.nextLine();
+		String mod = "UPDATE " + tabla + " SET " + col1 + "=" + valor1 + " WHERE " + col2 + "=" + valor2 + ";";
 		st.execute(mod);
 	}
   /*
    * Este método elimina los datos de la tabla que nos pasa el usuario por parámetro.
    */
   public static void borrar(Statement st, String tabla) throws SQLException {
-	String borrar = "DELETE FROM " + tabla;
+	String borrar = "DROP TABLE IF EXISTS " + tabla;
 	st.execute(borrar);
 	if(tabla==null) System.out.println("Borrado ejectutado correctamente");
 	else System.out.println("Borrado fallido");
+	System.out.println();
 }
 }
